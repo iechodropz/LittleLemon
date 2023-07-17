@@ -1,4 +1,5 @@
 from django.test import TestCase, Client
+from django.contrib.auth.models import User
 from restaurant.models import Menu
 from django.core.serializers import serialize
 import json
@@ -10,6 +11,8 @@ class MenuViewTest(TestCase):
         Menu.objects.create(title="Burger", price=120, inventory=50)
         Menu.objects.create(title="Pizza", price=200, inventory=30)
 
+        self.create_authenticated_user(username="testuser", password="testpass")
+
     def test_getall(self):
         menu_data = Menu.objects.all()
         menu_data_serialized = serialize("json", menu_data)
@@ -18,9 +21,13 @@ class MenuViewTest(TestCase):
             {"id": item["pk"], **item["fields"]} for item in menu_data_deserialized
         ]
 
-        client = Client()
-        response = client.get("/restaurant/menu/")
+        response = self.client.get("/restaurant/menu/")
         response_deserialized = json.loads(response.content.decode())
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_deserialized, fields_values)
+
+    def create_authenticated_user(self, username, password):
+        User.objects.create_user(username=username, password=password)
+        self.client = Client()
+        self.client.login(username=username, password=password)
