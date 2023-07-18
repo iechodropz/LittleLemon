@@ -7,4 +7,4 @@ Meta Back-End Developer Professional Certificate Capstone Project
 /restaurant/booking/tables \
 /restaurant/booking/tables/1 \
 /restaurant/api-token-auth \
-/auth/token/login \
+/auth/token/login
